@@ -158,7 +158,7 @@ MultiRes.load = function(img) {
 		try {
 		    blob = new Blob([new Uint8Array(ds.buffer)]);
 		} catch(e) {
-		    var bb = new BlobBuilder();
+		    var bb = new (WebKitBlobBuilder || MozBlobBuilder || MSBlobBuilder)();
 		    bb.append(ds.buffer);
 		    blob = bb.getBlob();
 		}
