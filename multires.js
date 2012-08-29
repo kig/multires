@@ -152,7 +152,15 @@ MultiRes.load = function(img) {
 		MultiRes.log('loaded', Math.round(100*ev.loaded/ev.total), 'percent of file');
 		done = true;
 		this.abort();
-		MultiRes.showImage(img, new Blob([new Uint8Array(ds.buffer)]), himg);
+		var blob;
+		try {
+		    blob = new Blob([new Uint8Array(ds.buffer)]);
+		} catch(e) {
+		    var bb = new BlobBuilder();
+		    bb.append(ds.buffer);
+		    blob = bb.getBlob();
+		}
+		MultiRes.showImage(img, blob, himg);
 	    }
 	} else if (header === false) {
 	    done = true;
