@@ -36,12 +36,20 @@ This viewer loads all the smaller versions of the image on its way to the displa
 Downloading a higher resolution version of an image when you zoom into it is possible by hanging onto the header and doing a HTTP Range request for the high-res version. Not implemented yet.
 
 
+Tech details
+---
+
+The SPIF format starts with a header that tells the offsets and sizes of the images in the SPIF. The images are stored smallest first, but there are no image size restrictions apart from that.
+
+For fast initial display, SPIFs should start with a small 32x32 thumbnail that fits in the same TCP packet with the header. That way you get an image on the first packet. After getting the initial image in, you can skip to realistic-size images.
+
+
 JS implementation issues
 ---
 
-Mobile Safari doesn't support Blobs, so this JS implementation loads the image using a data URL. Data URLs don't work for large images in Mobile Safari.
+Safari doesn't support Blob URLs as image sources, so on Safari the images are loaded using a data URL. On Chrome, the images are loaded using Blob URLs.
 
-XMLHttpRequest with ArrayBuffer response type doesn't give you access to partially loaded data, so you can't stop loading early. As a workaround, this implementation uses responseText which is slower but gives you partial results. Mobile Safari doesn't give you access to partially loaded data, so you can't stop loading early on it.
+XMLHttpRequest with ArrayBuffer response type doesn't give you access to partially loaded data, so you can't stop loading early. As a workaround, this implementation uses responseText which is slower but gives you partial results.
 
 Parsing the images in JavaScript is kinda slow, exacerbated by having to deal with responseText and data URLs. Not a problem on the desktop, but uses more power on mobiles.
 

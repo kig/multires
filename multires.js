@@ -4,6 +4,7 @@ MultiRes.create = function(img) {
     var w = img.width;
     var h = img.height;
     var larger = Math.max(w,h);
+    var idim = larger;
     var canvas = document.createElement('canvas');
     var pc = document.createElement('canvas');
     pc.width = w;
@@ -12,12 +13,14 @@ MultiRes.create = function(img) {
     var pctx = pc.getContext('2d');
     pctx.drawImage(img, 0, 0, w, h);
     var mipmap = [];
-    while (larger >= 32 || (w == img.width && h == img.height)) {
+    while (larger >= 64 || (w == img.width && h == img.height)) {
 	canvas.width = w;
 	canvas.height = h;
 	ctx.drawImage(pc, 0, 0, w, h);
-	mipmap.unshift({width: w, height: h, data: atob(canvas.toDataURL('image/jpeg').slice(23))});
-	console.log(w, h, mipmap[0].data.length);
+	if (larger > 256 || larger < 32 || larger / idim > 0.4) {
+	    mipmap.unshift({width: w, height: h, data: atob(canvas.toDataURL('image/jpeg').slice(23))});
+	    console.log(w, h, mipmap[0].data.length);
+	}
 	var tmp = canvas;
 	canvas = pc;
 	pc = tmp;
@@ -31,6 +34,13 @@ MultiRes.create = function(img) {
 	    h >>= 1;
 	}
 	larger >>= 1;
+    }
+    if (larger > 32) {
+	canvas.width = Math.ceil(32*img.width/idim);
+	canvas.height = Math.ceil(32*img.height/idim);
+	ctx.drawImage(pc, 0, 0, canvas.width, canvas.height);
+	mipmap.unshift({width: canvas.width, height: canvas.height, data: atob(canvas.toDataURL('image/jpeg').slice(23))});
+	console.log(canvas.width, canvas.height, mipmap[0].data.length);
     }
     var off = 0;
     var ds = new DataStream();
