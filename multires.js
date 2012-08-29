@@ -179,7 +179,7 @@ MultiRes.log = function(msg) {
 	}
 	var elem = document.createElement('pre');
 	elem.appendChild(document.createTextNode(arr.join(" ")+"\n"));
-	document.body.appendChild(elem);
+	(document.getElementById('log') || document.body).appendChild(elem);
     }
 };
 

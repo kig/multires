@@ -10,8 +10,72 @@
         MultiRes.load(document.images[0]);
       }
     </script>
+    <style>
+      #test {
+        margin-right: 16px;
+      }
+      #content {
+        width: 800px;
+      }
+    </style>
   </head>
   <body>
-    <img data-src="test.spif" width="800" height="600">
+    <div>
+      <img id="test" data-src="test.spif" width="800" height="600" align="left">
+      <div id="log"></div>
+    </div>
+    <br style="clear:both;">
+    <div id="content">
+<h1>SPIF - Streaming Progressive Image Format</h1>
+
+<p>SPIF is a proof-of-concept image format that makes images look good on all screen resolutions.</p>
+
+<p>SPIF is easy to use, it behaves like a normal image.</p>
+
+<p>The difference between SPIF and normal images is that SPIF looks good on Retina displays and loads fast on mobile browsers.</p>
+
+<h2>How SPIF works</h2>
+
+<p>A SPIF file contains several versions of the same image at different resolutions.</p>
+
+<p>The SPIF viewer loads the version of the image that's closest to the displayed size.</p>
+
+<p>The SPIF viewer saves bandwidth by not loading the other versions of the image.</p>
+
+<h2>Problems to solve</h2>
+
+<p>Browsers don't load SPIF images natively. This implementation is using JS to load and parse the SPIF files.</p>
+
+<p>Browsers don't cache partial downloads. This can be worked around in this JS implementation by using client-side storage.</p>
+
+<p>This viewer loads all the smaller versions of the image on its way to the display resolution. This allows the viewer to get away with only one HTTP request per image. A bandwidth-optimal solution would load the SPIF header, then issue a HTTP Range request to load the wanted image version. A &lt;img srcset> or &lt;picture> -style solution lets you skip the header load (as it basically inlines the header in the HTML), but it's more trouble for web developers.</p>
+
+<p>Downloading a higher resolution version of an image when you zoom into it is possible by hanging onto the header and doing a HTTP Range request for the high-res version. Not implemented yet.</p>
+
+
+<h2>JS implementation issues</h2>
+
+<p>Mobile Safari doesn't support Blobs, so this JS implementation loads the image using a data URL. Data URLs don't work for large images in Mobile Safari.</p>
+
+<p>XMLHttpRequest with ArrayBuffer response type doesn't give you access to partially loaded data, so you can't stop loading early. As a workaround, this implementation uses responseText which is slower but gives you partial results. Mobile Safari doesn't give you access to partially loaded data, so you can't stop loading early on it.</p>
+
+<p>Parsing the images in JavaScript is kinda slow, exacerbated by having to deal with responseText and data URLs. Not a problem on the desktop, but uses more power on mobiles.</p>
+
+    </div>
+<a href="https://github.com/kig/multires"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1485935-6']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
   </body>
 </html>
