@@ -113,8 +113,8 @@ MultiRes.getHeaderImage = function(header, wantedSize) {
 
 MultiRes.getWantedImageSize = function(img) {
     return {
-	width : window.devicePixelRatio * img.width,
-	height : window.devicePixelRatio * img.height
+	width : window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.width,
+	height : window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.height
     };
 };
 
