@@ -160,7 +160,9 @@ MultiRes.load = function(img) {
 		    bb.append(ds.buffer);
 		    blob = bb.getBlob();
 		}
+		MultiRes.log("created blob");
 		MultiRes.showImage(img, blob, himg);
+		MultiRes.log("set img src to blob slice");
 	    }
 	} else if (header === false) {
 	    done = true;
