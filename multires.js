@@ -9,20 +9,21 @@ MultiRes.create = function(img) {
     pc.width = w;
     pc.height = h;
     var ctx = canvas.getContext('2d');
-    var pctx = canvas.getContext('2d');
-    pctx.drawImage(img, 0, 0);
+    var pctx = pc.getContext('2d');
+    pctx.drawImage(img, 0, 0, w, h);
     var mipmap = [];
-    while (larger >= 1) {
+    while (larger >= 32 || (w == img.width && h == img.height)) {
 	canvas.width = w;
 	canvas.height = h;
 	ctx.drawImage(pc, 0, 0, w, h);
+	mipmap.unshift({width: w, height: h, data: atob(canvas.toDataURL('image/jpeg').slice(23))});
+	console.log(w, h, mipmap[0].data.length);
 	var tmp = canvas;
 	canvas = pc;
 	pc = tmp;
 	tmp = ctx;
 	ctx = pctx;
 	pctx = tmp;
-	mipmap.unshift({width:w, height:h, data:atob(canvas.toDataURL('image/jpeg',80).slice(23))});
 	if (w > 1) {
 	    w >>= 1;
 	}
@@ -224,7 +225,7 @@ MultiRes.load = function(img) {
 	if (header) {
 	    var himg = MultiRes.getHeaderImage(header, wantedSize);
 	    if (MultiRes.alreadyLoaded(ev, himg)) {
-		MultiRes.log('loaded size: '+himg.width+'x'+himg.height);
+		MultiRes.log('loaded target size: '+himg.width+'x'+himg.height);
 		if (ds.byteLength === 0) {
 		    ds.writeString(xhr.responseText);
 		}
@@ -234,10 +235,9 @@ MultiRes.load = function(img) {
 		MultiRes.log("aborting the rest of the request");
 		this.abort();
 		MultiRes.showImage(img, ds.buffer, himg);
-		MultiRes.log("set img src to slice");
 	    } else {
 		var limg = MultiRes.getLargestLoaded(header, ev);
-		if (limg.width > lastWidth) {
+		if (limg && limg.width > lastWidth) {
 		    lastWidth = limg.width;
 		    if (ds.byteLength === 0) {
 			ds.writeString(xhr.responseText);
