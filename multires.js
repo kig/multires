@@ -5,12 +5,20 @@ MultiRes.create = function(img) {
     var h = img.height;
     var larger = Math.max(w,h);
     var canvas = document.createElement('canvas');
+    var pc = document.createElement('canvas');
+    pc.width = w;
+    pc.height = h;
+    pc.drawImage(img, 0, 0);
     var ctx = canvas.getContext('2d');
+    var pctx = canvas.getContext('2d');
     var mipmap = [];
     while (larger >= 1) {
 	canvas.width = w;
 	canvas.height = h;
-	ctx.drawImage(img, 0, 0, w, h);
+	ctx.drawImage(pc, 0, 0, w, h);
+	var tmp = canvas;
+	canvas = pc;
+	pc = tmp;
 	mipmap.unshift({width:w, height:h, data:atob(canvas.toDataURL('image/jpeg',80).slice(23))});
 	if (w > 1) {
 	    w >>= 1;
@@ -62,13 +70,27 @@ MultiRes.createBlob = function(buffer) {
     return blob;
 };
 
+MultiRes.createURL = function(buf) {
+    if (window.Blob) {
+	var blob = MultiRes.createBlob(buf);
+	return MultiRes.createObjectURL(blob);
+    } else {
+	return 'data:image/jpeg;base64,'+btoa(new DataStream(buf).readString(buf.byteLength));;
+    }
+};
+
+MultiRes.revokeURL = function(url) {
+    if (window.Blob) {
+	MultiRes.revokeObjectURL(url);
+    }
+};
+
 MultiRes.showImage = function(img, buffer, offsets) {
     var ab = buffer.slice(offsets.start, offsets.length+offsets.start);
-    var blob = MultiRes.createBlob(ab);
-    var url = MultiRes.createObjectURL(blob);
+    var url = MultiRes.createURL(ab);
     img.src = url;
     img.addEventListener('load', function() {
-	MultiRes.revokeObjectURL(url);
+	MultiRes.revokeURL(url);
     }, true);
 };
 
