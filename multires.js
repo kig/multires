@@ -69,7 +69,7 @@ MultiRes.createBlob = function(buffer) {
 };
 
 MultiRes.createURL = function(buf) {
-    if (window.Blob && (window.URL || window.webkitURL)) {
+    if (window.Blob && (window.URL || window.webkitURL) && !/Safari/.test(navigator.userAgent)) { // Safari doesn't do Blob URLs
 	var blob = MultiRes.createBlob(buf);
 	return MultiRes.createObjectURL(blob);
     } else {

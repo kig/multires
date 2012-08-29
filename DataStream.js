@@ -1072,16 +1072,12 @@ DataStream.prototype.needArrayForFromCharCode = false;
  */
 DataStream.prototype.readString = function(length, encoding) {
   if (encoding == null || encoding == "ASCII") {
+    var str = "";
     var u8 = this.mapUint8Array(length == null ? this.byteLength-this.position : length);
-    if (this.needArrayForFromCharCode) {
-      var u8a = new Array(u8.length);
-      for (var i=0; i<u8.length; i++) {
-        u8a[i] = u8[i];
-      }
-      return String.fromCharCode.apply(String, u8a);
-    } else {
-      return String.fromCharCode.apply(String, u8);
+    for (var i=0; i<u8.length; i++) {
+      str += String.fromCharCode(u8[i]);
     }
+    return str;
   } else {
     return (new TextDecoder(encoding)).decode(this.mapUint8Array(length));
   }
