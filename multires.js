@@ -145,7 +145,7 @@ MultiRes.getLargestLoaded = function(header, ev) {
     var himg = null;
     for (var i=0; i<header.length; i++) {
 	himg = header[i];
-	if (himg.offset + himg.length > ev.loaded) {
+	if (himg.start + himg.length > ev.loaded) {
 	    break;
 	}
     }
