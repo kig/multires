@@ -68,8 +68,18 @@ MultiRes.createBlob = function(buffer) {
     return blob;
 };
 
+MultiRes.testBlobURLs = function() {
+    var blob = MultiRes.createBlob(new ArrayBuffer(10));
+    var url = MultiRes.createObjectURL(blob);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false);
+    xhr.send(null);
+    MultiRes.revokeObjectURL(url);
+    return xhr.responseText.length == 10;
+};
+
 MultiRes.createURL = function(buf) {
-    if (window.Blob && (window.URL || window.webkitURL) && !/Safari/.test(navigator.userAgent)) { // Safari doesn't do Blob URLs
+    if (window.Blob && (window.URL || window.webkitURL) && MultiRes.testBlobURLs()) {
 	var blob = MultiRes.createBlob(buf);
 	return MultiRes.createObjectURL(blob);
     } else {
