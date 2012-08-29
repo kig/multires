@@ -139,8 +139,7 @@ MultiRes.log = function(msg) {
 MultiRes.load = function(img) {
     var wantedSize = MultiRes.getWantedImageSize(img);
     MultiRes.log('img size in layout pixels: '+img.width+'x'+img.height);
-    MultiRes.log('img size in screen pixels: '+img.width*window.devicePixelRatio+'x'+img.height*window.devicePixelRatio);
-    MultiRes.log('load size: '+wantedSize.width+'x'+wantedSize.height);
+    MultiRes.log('img size in screen pixels: '+Math.ceil(wantedSize.width)+'x'+Math.ceil(wantedSize.height));
     var xhr = new XMLHttpRequest();
     //xhr.responseType = 'arraybuffer';
     var header = null;
