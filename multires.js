@@ -197,6 +197,7 @@ MultiRes.load = function(img) {
     //xhr.responseType = 'arraybuffer';
     var header = null;
     var done = false;
+    var lastWidth = 0;
     xhr.onprogress = xhr.onload = function(ev) {
 	if (!xhr.responseText || done) {
 	    return;
@@ -224,11 +225,15 @@ MultiRes.load = function(img) {
 		MultiRes.showImage(img, ds.buffer, himg);
 		MultiRes.log("set img src to slice");
 	    } else {
-		if (ds.byteLength === 0) {
-		    ds.writeString(xhr.responseText);
-		}
 		var limg = MultiRes.getLargestLoaded(header, ev);
-		MultiRes.showImage(img, ds.buffer, limg);
+		if (limg.width > lastWidth) {
+		    lastWidth = limg.width;
+		    if (ds.byteLength === 0) {
+			ds.writeString(xhr.responseText);
+		    }
+		    MultiRes.log('loaded size: '+limg.width+'x'+limg.height);
+		    MultiRes.showImage(img, ds.buffer, limg);
+		}
 	    }
 	} else if (header === false) {
 	    done = true;
