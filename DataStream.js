@@ -1,3 +1,7 @@
+if (!window.DataView) {
+    window.DataView = window.jDataView;
+}
+
 /**
   DataStream reads scalars, arrays and structs of data from an ArrayBuffer.
   It's like a file-like DataView on steroids.

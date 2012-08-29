@@ -71,16 +71,16 @@ MultiRes.createBlob = function(buffer) {
 };
 
 MultiRes.createURL = function(buf) {
-    if (window.Blob) {
+    if (window.Blob && (window.URL || window.webkitURL)) {
 	var blob = MultiRes.createBlob(buf);
 	return MultiRes.createObjectURL(blob);
     } else {
-	return 'data:image/jpeg;base64,'+btoa(new DataStream(buf).readString(buf.byteLength));;
+	return 'data:image/jpeg;base64,'+btoa(new DataStream(buf).readString(buf.byteLength));
     }
 };
 
 MultiRes.revokeURL = function(url) {
-    if (window.Blob) {
+    if (window.Blob && (window.URL || window.webkitURL)) {
 	MultiRes.revokeObjectURL(url);
     }
 };
@@ -134,9 +134,17 @@ MultiRes.getHeaderImage = function(header, wantedSize) {
 };
 
 MultiRes.getWantedImageSize = function(img) {
+    var w = window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.width;
+    var h = window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.height;
+    if (isNaN(w)) {
+	w = img.width;
+    }
+    if (isNaN(h)) {
+	w = img.height;
+    }
     return {
-	width : window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.width,
-	height : window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.height
+	width : w,
+	height : h
     };
 };
 
@@ -181,7 +189,7 @@ MultiRes.load = function(img) {
 	    var himg = MultiRes.getHeaderImage(header, wantedSize);
 	    if (MultiRes.alreadyLoaded(ev, himg)) {
 		MultiRes.log('loaded size: '+himg.width+'x'+himg.height);
-		if (ds.byteLength == 0) {
+		if (ds.byteLength === 0) {
 		    ds.writeString(xhr.responseText);
 		}
 		MultiRes.log('stopped loading at', ev.loaded);
