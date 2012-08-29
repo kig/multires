@@ -161,13 +161,13 @@ MultiRes.getLargestLoaded = function(header, ev) {
 };
 
 MultiRes.getWantedImageSize = function(img) {
-    var w = window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.width;
-    var h = window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.height;
+    var w = (window.devicePixelRatio || 1) * (window.outerWidth/window.innerWidth) * img.width;
+    var h = (window.devicePixelRatio || 1) * (window.outerWidth/window.innerWidth) * img.height;
     if (isNaN(w)) {
 	w = img.width;
     }
     if (isNaN(h)) {
-	w = img.height;
+	h = img.height;
     }
     return {
 	width : w,
