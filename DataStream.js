@@ -319,7 +319,6 @@ DataStream.prototype.mapUint16Array = function(length, e) {
 DataStream.prototype.mapUint8Array = function(length) {
   this._realloc(length * 1);
   var arr = new Uint8Array(this._buffer, this.byteOffset+this.position, length);
-    console.log(this.byteOffset, this.position, arr);
   this.position += length * 1;
   return arr;
 };

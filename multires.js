@@ -49,7 +49,6 @@ MultiRes.revokeObjectURL = function(url) {
 };
 
 MultiRes.showImage = function(img, blob, offsets) {
-    console.log(offsets);
     var b = blob.slice(offsets.start, offsets.length+offsets.start);
     var url = MultiRes.createObjectURL(b);
     img.src = url;
@@ -64,7 +63,6 @@ MultiRes.parseHeader = function(ab) {
     try {
 	var tag = ds.readString(4);
 	var tag2 = ds.readUint32();
-	console.log(tag, tag2);
 	if (tag !== 'SPIF' || tag2 !== 1) {
 	    return false;
 	}
@@ -78,6 +76,8 @@ MultiRes.parseHeader = function(ab) {
 	    ], 'imgCount']
 	]);
     } catch(e) {}
+    var orig = s.imgs[s.imgs.length-1];
+    console.log('original image size: '+orig.width+'x'+orig.height);
     return s.imgs;
 };
 
@@ -105,28 +105,43 @@ MultiRes.getWantedImageSize = function(img) {
 
 
 MultiRes.load = function(img) {
-    window.devicePixelRatio = 2;
     var wantedSize = MultiRes.getWantedImageSize(img);
+    console.log('img size in layout pixels: '+img.width+'x'+img.height);
+    console.log('img size in screen pixels: '+img.width*window.devicePixelRatio+'x'+img.height*window.devicePixelRatio);
+    console.log('load size: '+wantedSize.width+'x'+wantedSize.height);
     var xhr = new XMLHttpRequest();
-    xhr.responseType = 'arraybuffer';
+    //xhr.responseType = 'arraybuffer';
     var header = null;
+    var done = false;
     xhr.onprogress = xhr.onload = function(ev) {
-	if (!xhr.response) return;
-	header = header || MultiRes.parseHeader(xhr.response);
-	console.log(header);
+	if (!xhr.responseText || done) {
+	    return;
+	}
+	var ds = new DataStream();
+	if (!header) {
+	    ds.writeString(xhr.responseText);
+	    header = MultiRes.parseHeader(ds.buffer);
+	}
 	if (header) {
 	    var himg = MultiRes.getHeaderImage(header, wantedSize);
 	    if (MultiRes.alreadyLoaded(ev, himg)) {
-		var ds = new DataStream(xhr.response, himg.start);
-		console.log(xhr.response.byteLength, himg.start, ds.readString(4));
-		MultiRes.showImage(img, new Blob([new Uint8Array(xhr.response)]), himg);
-		console.log(ev.loaded);
+		console.log('loaded size: '+himg.width+'x'+himg.height);
+		if (ds.byteLength == 0) {
+		    ds.writeString(xhr.responseText);
+		}
+		console.log('stopped loading at', ev.loaded);
+		console.log('total', ev.total);
+		done = true;
 		this.abort();
+		MultiRes.showImage(img, new Blob([new Uint8Array(ds.buffer)]), himg);
 	    }
 	} else if (header === false) {
+	    done = true;
 	    this.abort();
 	}
     };
-    xhr.open("GET", img.dataset.src);
+    xhr.open("GET", img.dataset.src, true);
+    xhr.overrideMimeType("text/plain; charset=x-user-defined");
+    xhr.setRequestHeader("Content-Type", "text/plain");
     xhr.send(null);
 };
