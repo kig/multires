@@ -48,9 +48,24 @@ MultiRes.revokeObjectURL = function(url) {
     return (window.URL || window.webkitURL).revokeObjectURL(url);
 };
 
-MultiRes.showImage = function(img, blob, offsets) {
-    var b = blob.slice(offsets.start, offsets.length+offsets.start);
-    var url = MultiRes.createObjectURL(b);
+MultiRes.createBlob = function(buffer) {
+    MultiRes.log("making a blob");
+    var blob;
+    try {
+	blob = new Blob([new Uint8Array(buffer)]);
+    } catch(e) {
+	var bb = new (window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder)();
+	bb.append(buffer);
+	blob = bb.getBlob();
+    }
+    MultiRes.log("created blob");
+    return blob;
+};
+
+MultiRes.showImage = function(img, buffer, offsets) {
+    var ab = buffer.slice(offsets.start, offsets.length+offsets.start);
+    var blob = MultiRes.createBlob(ab);
+    var url = MultiRes.createObjectURL(blob);
     img.src = url;
     img.addEventListener('load', function() {
 	MultiRes.revokeObjectURL(url);
@@ -153,18 +168,8 @@ MultiRes.load = function(img) {
 		done = true;
 		MultiRes.log("aborting the rest of the request");
 		this.abort();
-		MultiRes.log("making a blob");
-		var blob;
-		try {
-		    blob = new Blob([new Uint8Array(ds.buffer)]);
-		} catch(e) {
-		    var bb = new (WebKitBlobBuilder || MozBlobBuilder || MSBlobBuilder)();
-		    bb.append(ds.buffer);
-		    blob = bb.getBlob();
-		}
-		MultiRes.log("created blob");
-		MultiRes.showImage(img, blob, himg);
-		MultiRes.log("set img src to blob slice");
+		MultiRes.showImage(img, ds.buffer, himg);
+		MultiRes.log("set img src to slice");
 	    }
 	} else if (header === false) {
 	    done = true;
