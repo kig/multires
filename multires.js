@@ -103,12 +103,29 @@ MultiRes.getWantedImageSize = function(img) {
     };
 };
 
+MultiRes.LOG_TO_CONSOLE = true;
+MultiRes.LOG_TO_PAGE = true;
+
+MultiRes.log = function(msg) {
+    if (MultiRes.LOG_TO_CONSOLE && window.console) {
+	console.log.apply(console, arguments);
+    }
+    if (MultiRes.LOG_TO_PAGE) {
+	var arr = [];
+	for (var i=0; i<arguments.length; i++) {
+	    arr.push(arguments[i]);
+	}
+	var elem = document.createElement('pre');
+	elem.appendChild(document.createTextNode(arr.join(" ")+"\n"));
+	document.body.appendChild(elem);
+    }
+};
 
 MultiRes.load = function(img) {
     var wantedSize = MultiRes.getWantedImageSize(img);
-    console.log('img size in layout pixels: '+img.width+'x'+img.height);
-    console.log('img size in screen pixels: '+img.width*window.devicePixelRatio+'x'+img.height*window.devicePixelRatio);
-    console.log('load size: '+wantedSize.width+'x'+wantedSize.height);
+    MultiRes.log('img size in layout pixels: '+img.width+'x'+img.height);
+    MultiRes.log('img size in screen pixels: '+img.width*window.devicePixelRatio+'x'+img.height*window.devicePixelRatio);
+    MultiRes.log('load size: '+wantedSize.width+'x'+wantedSize.height);
     var xhr = new XMLHttpRequest();
     //xhr.responseType = 'arraybuffer';
     var header = null;
@@ -121,16 +138,18 @@ MultiRes.load = function(img) {
 	if (!header) {
 	    ds.writeString(xhr.responseText);
 	    header = MultiRes.parseHeader(ds.buffer);
+	    MultiRes.log('got header with', header.length, 'entries');
+	    MultiRes.log('total file size', ev.total);
 	}
 	if (header) {
 	    var himg = MultiRes.getHeaderImage(header, wantedSize);
 	    if (MultiRes.alreadyLoaded(ev, himg)) {
-		console.log('loaded size: '+himg.width+'x'+himg.height);
+		MultiRes.log('loaded size: '+himg.width+'x'+himg.height);
 		if (ds.byteLength == 0) {
 		    ds.writeString(xhr.responseText);
 		}
-		console.log('stopped loading at', ev.loaded);
-		console.log('total', ev.total);
+		MultiRes.log('stopped loading at', ev.loaded);
+		MultiRes.log('loaded', Math.round(100*ev.loaded/ev.total), 'percent of file');
 		done = true;
 		this.abort();
 		MultiRes.showImage(img, new Blob([new Uint8Array(ds.buffer)]), himg);
