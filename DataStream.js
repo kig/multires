@@ -1052,6 +1052,16 @@ DataStream.prototype.writeUCS2String = function(str, endianness, lengthOverride)
   }
 };
 
+DataStream.prototype.needArrayForFromCharCode = false;
+(function() {
+  var u8 = new Uint8Array(4);
+  try {
+    String.fromCharCode.apply(String, u8);
+  } catch(e) {
+    DataStream.prototype.needArrayForFromCharCode = true;
+  }
+})();
+
 /**
   Read a string of desired length and encoding from the DataStream.
 
@@ -1062,7 +1072,16 @@ DataStream.prototype.writeUCS2String = function(str, endianness, lengthOverride)
  */
 DataStream.prototype.readString = function(length, encoding) {
   if (encoding == null || encoding == "ASCII") {
-    return String.fromCharCode.apply(null, this.mapUint8Array(length == null ? this.byteLength-this.position : length));
+    var u8 = this.mapUint8Array(length == null ? this.byteLength-this.position : length);
+    if (this.needArrayForFromCharCode) {
+      var u8a = new Array(u8.length);
+      for (var i=0; i<u8.length; i++) {
+        u8a[i] = u8[i];
+      }
+      return String.fromCharCode.apply(String, u8a);
+    } else {
+      return String.fromCharCode.apply(String, u8);
+    }
   } else {
     return (new TextDecoder(encoding)).decode(this.mapUint8Array(length));
   }

@@ -86,7 +86,15 @@ MultiRes.revokeURL = function(url) {
 };
 
 MultiRes.showImage = function(img, buffer, offsets) {
-    var ab = buffer.slice(offsets.start, offsets.length+offsets.start);
+    var ab;
+    if (buffer.slice) {
+	ab = buffer.slice(offsets.start, offsets.length+offsets.start); 
+    } else {
+	var u8 = new Uint8Array(buffer, offsets.start, offsets.length);
+	var dst = new Uint8Array(u8.length);
+	dst.set(u8);
+	ab = dst.buffer;
+    }
     var url = MultiRes.createURL(ab);
     img.src = url;
     img.addEventListener('load', function() {
@@ -94,7 +102,7 @@ MultiRes.showImage = function(img, buffer, offsets) {
     }, true);
 };
 
-MultiRes.parseHeader = function(ab) {
+MultiRes.parseHeader = function(ab) {    
     var ds = new DataStream(ab);
     var s;
     try {
@@ -180,6 +188,7 @@ MultiRes.load = function(img) {
 	}
 	var ds = new DataStream();
 	if (!header) {
+	    MultiRes.log('reading header');
 	    ds.writeString(xhr.responseText);
 	    header = MultiRes.parseHeader(ds.buffer);
 	    MultiRes.log('got header with', header.length, 'entries');
