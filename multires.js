@@ -77,7 +77,7 @@ MultiRes.parseHeader = function(ab) {
 	]);
     } catch(e) {}
     var orig = s.imgs[s.imgs.length-1];
-    console.log('original image size: '+orig.width+'x'+orig.height);
+    MultiRes.log('original image size: '+orig.width+'x'+orig.height);
     return s.imgs;
 };
 
@@ -103,8 +103,8 @@ MultiRes.getWantedImageSize = function(img) {
     };
 };
 
-MultiRes.LOG_TO_CONSOLE = true;
-MultiRes.LOG_TO_PAGE = true;
+MultiRes.LOG_TO_CONSOLE = false;
+MultiRes.LOG_TO_PAGE = false;
 
 MultiRes.log = function(msg) {
     if (MultiRes.LOG_TO_CONSOLE && window.console) {
