@@ -8,9 +8,9 @@ MultiRes.create = function(img) {
     var pc = document.createElement('canvas');
     pc.width = w;
     pc.height = h;
-    pc.drawImage(img, 0, 0);
     var ctx = canvas.getContext('2d');
     var pctx = canvas.getContext('2d');
+    pctx.drawImage(img, 0, 0);
     var mipmap = [];
     while (larger >= 1) {
 	canvas.width = w;
@@ -19,6 +19,9 @@ MultiRes.create = function(img) {
 	var tmp = canvas;
 	canvas = pc;
 	pc = tmp;
+	tmp = ctx;
+	ctx = pctx;
+	pctx = tmp;
 	mipmap.unshift({width:w, height:h, data:atob(canvas.toDataURL('image/jpeg',80).slice(23))});
 	if (w > 1) {
 	    w >>= 1;
