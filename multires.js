@@ -141,6 +141,17 @@ MultiRes.getHeaderImage = function(header, wantedSize) {
     return himg;
 };
 
+MultiRes.getLargestLoaded = function(header, ev) {
+    var himg = null;
+    for (var i=0; i<header.length; i++) {
+	himg = header[i];
+	if (himg.offset + himg.length > ev.loaded) {
+	    break;
+	}
+    }
+    return header[i-1];
+};
+
 MultiRes.getWantedImageSize = function(img) {
     var w = window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.width;
     var h = window.devicePixelRatio * (window.outerWidth/window.innerWidth) * img.height;
@@ -175,6 +186,10 @@ MultiRes.log = function(msg) {
 };
 
 MultiRes.load = function(img) {
+    if (!img.dataset || !img.dataset.src || (!/\.spif$/i.test(img.dataset.src) && !img.getAttribute('spif'))) {
+	// Not a SPIF image, skip it.
+	return false;
+    }
     var wantedSize = MultiRes.getWantedImageSize(img);
     MultiRes.log('img size in layout pixels: '+img.width+'x'+img.height);
     MultiRes.log('img size in screen pixels: '+Math.ceil(wantedSize.width)+'x'+Math.ceil(wantedSize.height));
@@ -208,6 +223,12 @@ MultiRes.load = function(img) {
 		this.abort();
 		MultiRes.showImage(img, ds.buffer, himg);
 		MultiRes.log("set img src to slice");
+	    } else {
+		if (ds.byteLength === 0) {
+		    ds.writeString(xhr.responseText);
+		}
+		var limg = MultiRes.getLargestLoaded(header, ev);
+		MultiRes.showImage(img, ds.buffer, limg);
 	    }
 	} else if (header === false) {
 	    done = true;
@@ -218,4 +239,5 @@ MultiRes.load = function(img) {
     xhr.overrideMimeType("text/plain; charset=x-user-defined");
     xhr.setRequestHeader("Content-Type", "text/plain");
     xhr.send(null);
+    return true;
 };
