@@ -17,6 +17,12 @@ The SPIF viewer loads the version of the image that's closest to the displayed s
 
 The SPIF viewer saves bandwidth by not loading the other versions of the image.
 
+The images are stored smallest size first, so the SPIF viewer can show the smaller versions of the image while loading.
+
+The image sizes are fully customizable, so you can serve pixel-perfect content to common devices.
+
+The images can have different content, so you can e.g. optimize GUI elements for usability by scaling text size in a non-linear fashion.
+
 
 Problems to solve
 ---
@@ -38,3 +44,12 @@ Mobile Safari doesn't support Blobs, so this JS implementation loads the image u
 XMLHttpRequest with ArrayBuffer response type doesn't give you access to partially loaded data, so you can't stop loading early. As a workaround, this implementation uses responseText which is slower but gives you partial results. Mobile Safari doesn't give you access to partially loaded data, so you can't stop loading early on it.
 
 Parsing the images in JavaScript is kinda slow, exacerbated by having to deal with responseText and data URLs. Not a problem on the desktop, but uses more power on mobiles.
+
+
+Things to investigate
+---
+
+Make the images smaller by storing higher-res versions as incremental diffs of the lower-res images.
+HiRes = scaleUp(LoRes) + HiResDiff; 
+HiResDiff = HiRes - scaleUp(LoRes);
+
