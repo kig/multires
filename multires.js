@@ -151,7 +151,9 @@ MultiRes.load = function(img) {
 		MultiRes.log('stopped loading at', ev.loaded);
 		MultiRes.log('loaded', Math.round(100*ev.loaded/ev.total), 'percent of file');
 		done = true;
+		MultiRes.log("aborting the rest of the request");
 		this.abort();
+		MultiRes.log("making a blob");
 		var blob;
 		try {
 		    blob = new Blob([new Uint8Array(ds.buffer)]);
