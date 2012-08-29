@@ -57,7 +57,6 @@ MultiRes.revokeObjectURL = function(url) {
 };
 
 MultiRes.createBlob = function(buffer) {
-    MultiRes.log("making a blob");
     var blob;
     try {
 	blob = new Blob([new Uint8Array(buffer)]);
@@ -66,7 +65,6 @@ MultiRes.createBlob = function(buffer) {
 	bb.append(buffer);
 	blob = bb.getBlob();
     }
-    MultiRes.log("created blob");
     return blob;
 };
 
