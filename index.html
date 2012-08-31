@@ -29,9 +29,7 @@
 <h1>SPIF - Streaming Progressive Image Format</h1>
 
 <p>SPIF is a proof-of-concept image format that makes images look good on all screen resolutions.</p>
-
 <p>SPIF is easy to use, it behaves like a normal image.</p>
-
 <p>The difference between SPIF and normal images is that SPIF looks good on Retina displays and loads fast on mobile browsers.</p>
 
 <h2>How SPIF works</h2>
@@ -44,10 +42,44 @@
 
 <h2>Tech details</h2>
 
+<p>The SPIF viewer tries to fill each screen pixel with at least one image pixel. To do that, the SPIF viewer loads the version of the image with dimensions larger or equal to the image's screen dimensions.</p>
+
 <p>The SPIF format starts with a header that tells the offsets and sizes of the images in the SPIF.
 The images are stored smallest first, but there are no image size restrictions apart from that.</p>
 
-<p>For fast initial display, SPIFs should start with a small 32x32 thumbnail that fits in the same TCP packet with the header. That way you get an image on the first packet. After getting the initial image in, you can skip to realistic-size images.</p>
+<p>The current viewer prototype loads the image until it finds a version that's large enough to cover the screen area used by the image. For less bandwidth use, the viewer can load just the header and first thumbnail, and get the wanted size image with a Range request.</p>
+
+<h2>Example</h2>
+
+<h3>The current uni-resolution way</h3>
+<ol>
+<li>Take a 7360 x 4912 photo with your fancy new camera.</li>
+<li>Use Photoshop to create 2048 x 1366, 1024 x 683 and 128 x 86 pixel versions of the image.</li>
+<li>Upload all the different versions to the server.</li>
+<li>Write HTML with img-tags that load the version you want.</li>
+<li>Images display at too low resolution on Retina MBP or at a too high, bandwidth wasting resolution on mobiles.</li>
+</ol>
+
+<h3>The current multi-resolution way</h3>
+<ol>
+<li>Take a 7360 x 4912 photo with your fancy new camera.</li>
+<li>Use Photoshop to create multiple smaller versions of the image.</li>
+<li>Upload all the different versions to the server.</li>
+<li>Write HTML with img-tags that load the thumbnail version. Set image display size with CSS / dimension attributes.</li>
+<li>Write a bit of JavaScript on your page that figures out the screen dimensions of your image and loads the smallest image that's larger than the screen dimensions.</li>
+<li>Images display at optimal resolution and use the minimum amount of bandwidth.</li>
+</ol>
+
+<h3>The SPIF way</h3>
+<ol>
+<li>Take a 7360 x 4912 photo with your fancy new camera.</li>
+<li>Convert the photo to a SPIF.</li>
+<li>Upload the SPIF to the server.</li>
+<li>Write HTML with img-tags that load the SPIF image. Set image display size with CSS / dimension attributes.</li>
+<li>Done. The browser does the rest.</li>
+<li>Images display at optimal resolution and use the minimum amount of bandwidth as long as the server does Range requests.</li>
+</ol>
+
 
 <h2>Problems to solve</h2>
 
@@ -59,6 +91,9 @@ The images are stored smallest first, but there are no image size restrictions a
 
 <p>Downloading a higher resolution version of an image when you zoom into it is possible by hanging onto the header and doing a HTTP Range request for the high-res version. Not implemented yet.</p>
 
+<p>For fast initial display, SPIFs should start with a small 32x32 thumbnail that fits in the same TCP packet with the header. That way you get an image on the first packet. After getting the initial image in, you can skip to realistic-size images.</p>
+
+<p>Maybe SPIF should be a directory of files instead of a single file, that way you could avoid all the browser-server-HTTP problems. Save the images into foo.spif/$POWER_OF_2, browser tries to fetch smallest power of two that covers the image screen area. On failure, request foo.spif/original.</p>
 
 <h2>JS implementation issues</h2>
 
