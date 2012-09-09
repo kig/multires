@@ -1,6 +1,6 @@
-MultiRes = {};
+SPIF = {};
 
-MultiRes.create = function(img) {
+SPIF.create = function(img) {
     var w = img.width;
     var h = img.height;
     var larger = Math.max(w,h);
@@ -62,15 +62,15 @@ MultiRes.create = function(img) {
     ds.save(segs[segs.length-1].split(".")[0] + ".spif");
 };
 
-MultiRes.createObjectURL = function(blob) {
+SPIF.createObjectURL = function(blob) {
     return (window.URL || window.webkitURL).createObjectURL(blob);
 };
 
-MultiRes.revokeObjectURL = function(url) {
+SPIF.revokeObjectURL = function(url) {
     return (window.URL || window.webkitURL).revokeObjectURL(url);
 };
 
-MultiRes.createBlob = function(buffer) {
+SPIF.createBlob = function(buffer) {
     var blob;
     try {
 	blob = new Blob([new Uint8Array(buffer)]);
@@ -82,32 +82,32 @@ MultiRes.createBlob = function(buffer) {
     return blob;
 };
 
-MultiRes.testBlobURLs = function() {
-    var blob = MultiRes.createBlob(new ArrayBuffer(10));
-    var url = MultiRes.createObjectURL(blob);
+SPIF.testBlobURLs = function() {
+    var blob = SPIF.createBlob(new ArrayBuffer(10));
+    var url = SPIF.createObjectURL(blob);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, false);
     xhr.send(null);
-    MultiRes.revokeObjectURL(url);
+    SPIF.revokeObjectURL(url);
     return xhr.responseText.length == 10;
 };
 
-MultiRes.createURL = function(buf) {
-    if (window.Blob && (window.URL || window.webkitURL) && MultiRes.testBlobURLs()) {
-	var blob = MultiRes.createBlob(buf);
-	return MultiRes.createObjectURL(blob);
+SPIF.createURL = function(buf) {
+    if (window.Blob && (window.URL || window.webkitURL) && SPIF.testBlobURLs()) {
+	var blob = SPIF.createBlob(buf);
+	return SPIF.createObjectURL(blob);
     } else {
 	return 'data:image/jpeg;base64,'+btoa(new DataStream(buf).readString(buf.byteLength));
     }
 };
 
-MultiRes.revokeURL = function(url) {
+SPIF.revokeURL = function(url) {
     if (window.Blob && (window.URL || window.webkitURL)) {
-	MultiRes.revokeObjectURL(url);
+	SPIF.revokeObjectURL(url);
     }
 };
 
-MultiRes.showImage = function(img, buffer, offsets) {
+SPIF.showImage = function(img, buffer, offsets) {
     var ab;
     if (buffer.slice) {
 	ab = buffer.slice(offsets.start, offsets.length+offsets.start); 
@@ -117,14 +117,14 @@ MultiRes.showImage = function(img, buffer, offsets) {
 	dst.set(u8);
 	ab = dst.buffer;
     }
-    var url = MultiRes.createURL(ab);
+    var url = SPIF.createURL(ab);
     img.src = url;
     img.addEventListener('load', function() {
-	MultiRes.revokeURL(url);
+	SPIF.revokeURL(url);
     }, true);
 };
 
-MultiRes.parseHeader = function(ab) {    
+SPIF.parseHeader = function(ab) {    
     var ds = new DataStream(ab);
     var s;
     try {
@@ -144,15 +144,15 @@ MultiRes.parseHeader = function(ab) {
 	]);
     } catch(e) {}
     var orig = s.imgs[s.imgs.length-1];
-    MultiRes.log('original image size: '+orig.width+'x'+orig.height);
+    SPIF.log('original image size: '+orig.width+'x'+orig.height);
     return s.imgs;
 };
 
-MultiRes.alreadyLoaded = function(ev, offsets) {
+SPIF.alreadyLoaded = function(ev, offsets) {
     return ev.loaded >= offsets.start + offsets.length;
 };
 
-MultiRes.getHeaderImage = function(header, wantedSize) {
+SPIF.getHeaderImage = function(header, wantedSize) {
     var himg = null;
     for (var i=0; i<header.length; i++) {
 	himg = header[i];
@@ -163,7 +163,7 @@ MultiRes.getHeaderImage = function(header, wantedSize) {
     return himg;
 };
 
-MultiRes.getLargestLoaded = function(header, ev) {
+SPIF.getLargestLoaded = function(header, ev) {
     var himg = null;
     for (var i=0; i<header.length; i++) {
 	himg = header[i];
@@ -174,7 +174,7 @@ MultiRes.getLargestLoaded = function(header, ev) {
     return header[i-1];
 };
 
-MultiRes.getWantedImageSize = function(img) {
+SPIF.getWantedImageSize = function(img) {
     var w = (window.devicePixelRatio || 1) * (window.outerWidth/window.innerWidth) * img.width;
     var h = (window.devicePixelRatio || 1) * (window.outerWidth/window.innerWidth) * img.height;
     if (isNaN(w)) {
@@ -189,14 +189,14 @@ MultiRes.getWantedImageSize = function(img) {
     };
 };
 
-MultiRes.LOG_TO_CONSOLE = false;
-MultiRes.LOG_TO_PAGE = false;
+SPIF.LOG_TO_CONSOLE = false;
+SPIF.LOG_TO_PAGE = false;
 
-MultiRes.log = function(msg) {
-    if (MultiRes.LOG_TO_CONSOLE && window.console) {
+SPIF.log = function(msg) {
+    if (SPIF.LOG_TO_CONSOLE && window.console) {
 	console.log.apply(console, arguments);
     }
-    if (MultiRes.LOG_TO_PAGE) {
+    if (SPIF.LOG_TO_PAGE) {
 	var arr = [];
 	for (var i=0; i<arguments.length; i++) {
 	    arr.push(arguments[i]);
@@ -207,14 +207,14 @@ MultiRes.log = function(msg) {
     }
 };
 
-MultiRes.load = function(img) {
+SPIF.load = function(img) {
     if (!img.dataset || !img.dataset.src || (!/\.spif$/i.test(img.dataset.src) && !img.getAttribute('spif'))) {
 	// Not a SPIF image, skip it.
 	return false;
     }
-    var wantedSize = MultiRes.getWantedImageSize(img);
-    MultiRes.log('img size in layout pixels: '+img.width+'x'+img.height);
-    MultiRes.log('img size in screen pixels: '+Math.ceil(wantedSize.width)+'x'+Math.ceil(wantedSize.height));
+    var wantedSize = SPIF.getWantedImageSize(img);
+    SPIF.log('img size in layout pixels: '+img.width+'x'+img.height);
+    SPIF.log('img size in screen pixels: '+Math.ceil(wantedSize.width)+'x'+Math.ceil(wantedSize.height));
     var xhr = new XMLHttpRequest();
     //xhr.responseType = 'arraybuffer';
     var header = null;
@@ -226,34 +226,34 @@ MultiRes.load = function(img) {
 	}
 	var ds = new DataStream();
 	if (!header) {
-	    MultiRes.log('reading header');
+	    SPIF.log('reading header');
 	    ds.writeString(xhr.responseText);
-	    header = MultiRes.parseHeader(ds.buffer);
-	    MultiRes.log('got header with', header.length, 'entries');
-	    MultiRes.log('total file size', ev.total);
+	    header = SPIF.parseHeader(ds.buffer);
+	    SPIF.log('got header with', header.length, 'entries');
+	    SPIF.log('total file size', ev.total);
 	}
 	if (header) {
-	    var himg = MultiRes.getHeaderImage(header, wantedSize);
-	    if (MultiRes.alreadyLoaded(ev, himg)) {
-		MultiRes.log('loaded target size: '+himg.width+'x'+himg.height);
+	    var himg = SPIF.getHeaderImage(header, wantedSize);
+	    if (SPIF.alreadyLoaded(ev, himg)) {
+		SPIF.log('loaded target size: '+himg.width+'x'+himg.height);
 		if (ds.byteLength === 0) {
 		    ds.writeString(xhr.responseText);
 		}
-		MultiRes.log('stopped loading at', ev.loaded);
-		MultiRes.log('loaded', Math.round(100*ev.loaded/ev.total), 'percent of file');
+		SPIF.log('stopped loading at', ev.loaded);
+		SPIF.log('loaded', Math.round(100*ev.loaded/ev.total), 'percent of file');
 		done = true;
-		MultiRes.log("aborting the rest of the request");
+		SPIF.log("aborting the rest of the request");
 		this.abort();
-		MultiRes.showImage(img, ds.buffer, himg);
+		SPIF.showImage(img, ds.buffer, himg);
 	    } else {
-		var limg = MultiRes.getLargestLoaded(header, ev);
+		var limg = SPIF.getLargestLoaded(header, ev);
 		if (limg && limg.width > lastWidth) {
 		    lastWidth = limg.width;
 		    if (ds.byteLength === 0) {
 			ds.writeString(xhr.responseText);
 		    }
-		    MultiRes.log('loaded size: '+limg.width+'x'+limg.height);
-		    MultiRes.showImage(img, ds.buffer, limg);
+		    SPIF.log('loaded size: '+limg.width+'x'+limg.height);
+		    SPIF.showImage(img, ds.buffer, limg);
 		}
 	    }
 	} else if (header === false) {
