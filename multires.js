@@ -67,7 +67,7 @@ if (typeof MultiRes === 'undefined') {
     };
 
     MultiRes.load = function(img) {
-        if (!/\.\d+\.mres\/\d+$/i.test(img.src)) {
+        if (!/\.\d+\.mres\/\d+\..+$/i.test(img.src)) {
             // Not a MultiRes image, skip it.
             return false;
         } else if (this.imageIndex[img.__uid] !== undefined) {
@@ -75,9 +75,9 @@ if (typeof MultiRes === 'undefined') {
             return false;
         }
         img.__multiResSrc = img.src.split("/").slice(0,-1).join("/");
-        var segs = img.src.split(".");
+        var segs = img.__multiResSrc.split(".");
         img.__maxZ = parseInt(segs[segs.length-2]);
-        img.__suffix = segs[segs.length-3];
+        img.__suffix = img.src.split(".").slice(-1)[0];
         this.startMonitoring(img);
         img.addEventListener('DOMNodeRemoved', function(ev) {
             if (ev.target === this) {

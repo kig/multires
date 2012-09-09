@@ -14,7 +14,7 @@ cmultires 5000px_wide_image.jpg
 # Upload the multires directory to your server
 
 # Add an img tag for the image to your HTML
-<img src="5000px_wide_image.jpg.13.mres/9" width="480" height="320">
+<img src="5000px_wide_image.jpg.13.mres/9.jpg" width="480" height="320">
 
 # Add the multires.js script to the end of your page
 <script src="multires.js"></script>
