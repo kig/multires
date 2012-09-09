@@ -77,6 +77,7 @@ if (typeof MultiRes === 'undefined') {
         img.__multiResSrc = img.src.split("/").slice(0,-1).join("/");
         var segs = img.src.split(".");
         img.__maxZ = parseInt(segs[segs.length-2]);
+        img.__suffix = segs[segs.length-3];
         this.startMonitoring(img);
         img.addEventListener('DOMNodeRemoved', function(ev) {
             if (ev.target === this) {
@@ -95,7 +96,7 @@ if (typeof MultiRes === 'undefined') {
         if (z > img.__maxZ) {
             z = img.__maxZ;
         }
-        var src = img.__multiResSrc + '/' + z;
+        var src = img.__multiResSrc + '/' + z + "." + img.__suffix;
         if (img.src !== src && 
             (!img.__loadingImage || img.__loadingImage.src !== src)) {
             if (!img.__loadingImage) {
