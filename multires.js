@@ -67,7 +67,7 @@ if (typeof MultiRes === 'undefined') {
     };
 
     MultiRes.load = function(img) {
-        if (!/\.\d+\.mres\/\d+\..+$/i.test(img.src)) {
+        if (!/\.\d+\.mres\/\d+$/i.test(img.src)) {
             // Not a MultiRes image, skip it.
             return false;
         } else if (this.imageIndex[img.__uid] !== undefined) {
@@ -77,7 +77,6 @@ if (typeof MultiRes === 'undefined') {
         img.__multiResSrc = img.src.split("/").slice(0,-1).join("/");
         var segs = img.__multiResSrc.split(".");
         img.__maxZ = parseInt(segs[segs.length-2]);
-        img.__suffix = img.src.split(".").slice(-1)[0];
         this.startMonitoring(img);
         img.addEventListener('DOMNodeRemoved', function(ev) {
             if (ev.target === this) {
@@ -96,7 +95,7 @@ if (typeof MultiRes === 'undefined') {
         if (z > img.__maxZ) {
             z = img.__maxZ;
         }
-        var src = img.__multiResSrc + '/' + z + "." + img.__suffix;
+        var src = img.__multiResSrc + '/' + z;
         if (img.src !== src && 
             (!img.__loadingImage || img.__loadingImage.src !== src)) {
             if (!img.__loadingImage) {

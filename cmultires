@@ -8,15 +8,14 @@ end
 ARGV.each{|fn|
   fn = File.expand_path(fn)
   id = `identify #{esc(fn)}`
-  ext = File.extname(fn)
   dims = id.split(" ").find_all{|s| s =~ /\A\d+x\d+\Z/ }.last.split("x")
   dims.map!{|s| s.to_f }
   max_z = (Math.log(dims.max) / Math.log(2)).ceil
   dname = "#{fn}.#{max_z}.mres"
   Dir.mkdir(dname)
-  FileUtils.cp(fn, File.join(dname, "#{max_z}#{ext}"))
+  FileUtils.cp(fn, File.join(dname, "#{max_z}"))
   (0...max_z).each{|z|
     sz = 2 ** z
-    system('convert', fn, '-scale', "#{sz}x#{sz}", File.join(dname, "#{z}#{ext}"))
+    system('convert', fn, '-scale', "#{sz}x#{sz}", File.join(dname, "#{z}"))
   }
 }
