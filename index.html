@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <style>
+      #test {
+        margin-right: 16px;
+      }
+      #content {
+        max-width: 1000px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <img id="test" src="_MG_8274.jpg.13.mres/7" width="400" height="600" align="left">
+      <div id="log"></div>
+    </div>
+    <div id="content">
+<h1>MultiRes - Multi-resolution image format</h1>
+
+<p>Test it now! Zoom in to the photo on the left. You can use Ctrl/Cmd-+ to zoom in. Note how the GitHub banner gets pixelated but the photo stays sharp.
+
+<p>MultiRes is an image format that makes images look good on all screen resolutions, from mobile displays to Retina displays.</p>
+
+<p>When an image is zoomed out, MultiRes loads a smaller version of the image. When you zoom in to the image, MultiRes loads a larger version of the image.</p>
+
+<h2>How MultiRes works</h2>
+
+<p>MultiRes keeps each screen pixel filled with at least one image pixel, up to the maximum resolution of the image.</p>
+
+<p>A MultiRes image directory contains several versions of the same image at different resolutions.</p>
+
+<p>The MultiRes viewer loads the version of the image that's closest to the displayed size.</p>
+
+<p>The MultiRes viewer saves bandwidth by not loading the other versions of the image.</p>
+
+<h2>What happened to SPIF?</h2>
+
+<p>You can still check out the <a href="spif/spif.html">SPIF image format prototype here</a>. SPIF is problematic because it requires HTTP Range requests to work well. It's also a lot more complicated to parse out images from a single file than it is to have a directory with a separate file for each image size.
+
+    </div>
+<a href="https://github.com/kig/multires"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+<script src="multires.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1485935-6']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+  </body>
+</html>
