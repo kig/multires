@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <style>
+      img {
+        cursor: pointer;
+        box-shadow: 0px 2px 5px rgba(0,0,0,0.5);
+        margin-right: 16px;
+      }
+      .zoomed {
+        box-shadow: 0px 2px 20px rgba(0,0,0,0.75);
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <img src="test_images/656629main_latest_0171-012949.jpeg.12.mres/8">
+      <img src="test_images/667436main_20120712_164532_orig_full.jpeg.12.mres/8">
+      <img src="test_images/IMG_8274.jpg.13.mres/8">
+      <img src="test_images/latest_4096_0171.jpg.12.mres/8">
+      <img src="test_images/test.jpg.12.mres/8">
+    </div>
+
+<script src="multires.js"></script>
+
+<script>
+  var showImage = function(ev) {
+    ev.preventDefault();
+    var img = new Image();
+    img.src = this.src;
+    var w = this.width;
+    var h = this.height;
+    img.style.width = this.width + 'px';
+    img.style.height = this.height + 'px';
+    img.style.position = 'absolute';
+    var cbr = this.getBoundingClientRect();
+    img.style.top = cbr.top + 'px';
+    img.style.left = cbr.left + 'px';
+    img.style.opacity = 0;
+    img.style.webkitTransition = '1s';
+    img.className = 'zoomed';
+    img.onclick = function() {
+      img.style.webkitTransition = '0.5s';
+      img.style.opacity = 0;
+      setTimeout(function(){
+        img.parentNode.removeChild(img);
+      }, 500);
+    };
+    document.body.appendChild(img);
+    setTimeout(function(){
+      var iw = window.innerWidth;
+      var ih = window.innerHeight;
+      var ratio = Math.max(w/(iw-40), h/(ih-40));
+      var nw = w/ratio;
+      var nh = h/ratio;
+      img.style.width = nw + 'px';
+      img.style.height = nh + 'px';
+      img.style.left = iw/2 - nw/2 + 'px';
+      img.style.top = ih/2 - nh/2 + 'px';
+      img.style.opacity = 1;
+    }, 0);
+  };
+window.onload = function() {
+  var imgs = document.images;
+  for (var i=0; i<imgs.length; i++) {
+    imgs[i].addEventListener('click', showImage, false);
+    imgs[i].width = imgs[i].width;
+    imgs[i].height = imgs[i].height;
+  }
+};
+</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1485935-6']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+  </body>
+</html>

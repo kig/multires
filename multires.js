@@ -7,8 +7,17 @@ if (typeof MultiRes === 'undefined') {
     MultiRes.imageIndex = {};
     MultiRes.initDone = false;
 
-    MultiRes.getPhysicalImageSize = function(img, ratio, iw, ih) {
+    MultiRes.getScreenImageSize = function(img, ratio, iw, ih) {
+        if (!img.complete || img.width === 0 || img.naturalWidth === 0) {
+            return null;
+        }
         var bb = img.getBoundingClientRect();
+        if (img.getAttribute('width') == null) {
+            img.setAttribute('width', img.width);
+        }
+        if (img.getAttribute('height') == null) {
+            img.setAttribute('height', img.height);
+        }
         var w = ratio * bb.width;
         var h = ratio * bb.height;
         var vw=0, vh=0, vtop=0, vleft=0;
@@ -127,7 +136,8 @@ if (typeof MultiRes === 'undefined') {
         for (i = 0; i < this.monitoredImages.length; i++) {
             needUpdate = false;
             var img = this.monitoredImages[i];
-            var phySz = this.getPhysicalImageSize(img, ratio, iw, ih);
+            var phySz = this.getScreenImageSize(img, ratio, iw, ih);
+            if (phySz === null) continue;
             if (img.deviceWidth !== phySz.width || 
                 img.deviceHeight !== phySz.height)
             {
@@ -177,6 +187,7 @@ if (typeof MultiRes === 'undefined') {
                                 true);
         window.addEventListener('resize', this.requestUpdate.bind(this), true);
         window.addEventListener('scroll', this.requestUpdate.bind(this), true);
+        this.updateInterval = setInterval(this.requestUpdate.bind(this), 200);
         this.updateImages();
     };
 
